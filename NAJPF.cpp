@@ -1,64 +1,74 @@
-#include <bits/stdc++.h>
+#include <vector>
+#include <iostream>
 using namespace std;
 #define fast cin.sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL);
 
-vector<int> get_lps(string &pattern){
-    vector<int> pi(pattern.size(), 0);
+vector<int> get_lps(string const &pattern){
+    int size = pattern.size();
+    vector<int> PI(size);
+    int i = 1;
     int j = 0;
-    for(int i = 1; i < pattern.size();){
+    while(i < size){
         if(pattern[i] == pattern[j]){
-            pi[i++] = ++j;
+            PI[i++] = ++j; 
         }else{
-            if(j){
-                j = pi[j-1];
+            if(j != 0){
+                j = PI[j-1];
             }else{
-                pi[i] = 0;
-                i++;
+                PI[i++] = 0;
             }
         }
     }
-    return pi;
+    return PI;
 }
 
-void solve(string &text, string &pattern){
+vector<int> solve(string const &text, string const &pattern){
     vector<int> res;
-    vector<int> lps = get_lps(pattern);
-    int tl = text.size();
-    int pl = pattern.size();
-    int i = 0;
-    int j = 0;
-    while(i < tl && j < pl){
-        if(text[i] == pattern[j]){
-            i++;
-            j++;
+    int textLength = text.size();
+    int patternLength = pattern.size();
+    if(patternLength > textLength){
+        return res;
+    }
+    vector<int> LPS = get_lps(pattern);
+    int textPos = 0;
+    int patternPos = 0;
+    while(textPos < textLength){
+        if(text[textPos] == pattern[patternPos]){
+            textPos++;
+            patternPos++;
         }else{
-            if(j){
-                j = lps[j-1];
+            if(patternPos != 0){
+                patternPos = LPS[patternPos - 1];
             }else{
-                i++;
+                textPos++;
             }
         }
-        if(j == pl){
-            res.push_back(i - j + 1);
-            j = 0;
+        if(patternPos == patternLength){
+            int idx = textPos - patternLength + 1;
+            res.push_back(idx);
+            patternPos = 0;
         }
     }
-    if(res.size()){
-        cout << res.size() << "\n";
-        for(int x : res)
-            cout << x << " ";
-    }else{
-        cout << "Not Found";
-    }
-    cout << "\n";
+    return res;
 }
 
 int main(){
     fast
     int t; cin >> t;
     while(t--){
-        string text, pattern;
-        cin >> text >> pattern;
-        solve(text, pattern);
+        string a, b;
+        cin >> a >> b;
+        auto res = solve(a,b);
+        int sz = res.size();
+        if(sz){
+            cout << sz << "\n";
+            for(int i : res){
+                cout << i << " ";
+            }
+        }else{
+            cout << "Not Found";;
+        }
+        cout << "\n";
     }
+    return 0;
 }
